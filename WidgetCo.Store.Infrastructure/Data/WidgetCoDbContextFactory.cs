@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
+﻿using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.Net.NetworkInformation;
 
 namespace WidgetCo.Store.Infrastructure.Data
 {
@@ -9,17 +8,15 @@ namespace WidgetCo.Store.Infrastructure.Data
     {
         public WidgetCoDbContext CreateDbContext(string[] args)
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-
+            // Build configuration
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../WidgetCo.Store.Api")) // Point to API project
-                .AddJsonFile("appsettings.json", optional: false)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true)
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.Development.json", optional: true)
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<WidgetCoDbContext>();
-            var connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             optionsBuilder.UseSqlServer(connectionString, b =>
                 b.MigrationsAssembly(typeof(WidgetCoDbContext).Assembly.FullName));

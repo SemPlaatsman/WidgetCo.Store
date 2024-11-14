@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WidgetCo.Store.Core.Models;
-using WidgetCo.Store.Infrastructure.Data.Configurations;
 
 namespace WidgetCo.Store.Infrastructure.Data
 {
@@ -11,16 +10,12 @@ namespace WidgetCo.Store.Infrastructure.Data
         {
         }
 
-        public DbSet<Product> Products { get; set; } = null!;
-        public DbSet<Order> Orders { get; set; } = null!;
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
-            // Explicitly apply configurations
-            modelBuilder.ApplyConfiguration(new ProductConfiguration());
-            modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(WidgetCoDbContext).Assembly);
         }
     }
 }
