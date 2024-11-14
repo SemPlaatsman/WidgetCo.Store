@@ -13,6 +13,8 @@ namespace WidgetCo.Store.Infrastructure
 
             services.AddScoped<IOrderService, OrderService>();
 
+            services.AddScoped<IProductService, ProductService>();
+
             return services;
         }
     }

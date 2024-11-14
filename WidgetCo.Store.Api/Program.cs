@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Add application services and configuration
+builder.Services.AddApplicationDatabase(builder.Configuration);
 builder.Services.AddApplicationConfiguration(builder.Configuration);
 builder.Services.AddApplicationServices();
 
