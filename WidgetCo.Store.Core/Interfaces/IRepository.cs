@@ -1,11 +1,12 @@
 ﻿namespace WidgetCo.Store.Core.Interfaces
 {
-    public interface IRepository<T> where T : class
+    public interface IRepository<TEntity> where TEntity : class
     {
-        Task<T?> GetByIdAsync(string id);
-        Task<IReadOnlyList<T>> ListAllAsync();
-        Task<T> AddAsync(T entity);
-        Task UpdateAsync(T entity);
-        Task DeleteAsync(T entity);
+        Task<TEntity?> GetByIdAsync(string id);
+        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<string> AddAsync(TEntity entity);
+        Task UpdateAsync(TEntity entity);
+        Task DeleteAsync(string id);
+        IQueryable<TEntity> Query();
     }
 }

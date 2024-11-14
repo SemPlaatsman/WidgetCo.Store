@@ -1,0 +1,17 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    //"storageConnectionString": "UseDevelopmentStorage=true"
+    "AzureStorage:ConnectionString": "UseDevelopmentStorage=true",
+    "Api:ReturnDetailedErrors": true,
+    "Functions:Worker:HostEndpoint": "http://localhost:7166",
+    "AZURE_FUNCTIONS_ENVIRONMENT": "Development",
+    "AzureFunctionsJobHost:logging:logLevel:default": "Information",
+    "AzureFunctionsJobHost:logging:logLevel:Function": "Information"
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=WidgetCoStore;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}

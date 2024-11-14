@@ -1,18 +1,12 @@
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using WidgetCo.Store.Infrastructure;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-var host = new HostBuilder()
-    .ConfigureFunctionsWebApplication()
-    .ConfigureServices((context, services) =>
+namespace WidgetCo.Store.Functions
+{
+    internal class Program
     {
-        services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();
-
-        services.AddApplicationConfiguration(context.Configuration);
-        services.AddApplicationServices();
-    })
-    .Build();
-
-await host.RunAsync();
+    }
+}
