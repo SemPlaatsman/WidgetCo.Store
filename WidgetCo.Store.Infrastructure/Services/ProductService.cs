@@ -11,14 +11,14 @@ namespace WidgetCo.Store.Infrastructure.Services
 {
     public class ProductService : IProductService
     {
-        private readonly WidgetCoDbContext _dbContext;
+        private readonly IRepository<Product> _productRepository;
         private readonly ILogger<ProductService> _logger;
 
         public ProductService(
-            WidgetCoDbContext dbContext,
+            IRepository<Product> productRepository,
             ILogger<ProductService> logger)
         {
-            _dbContext = dbContext;
+            _productRepository = productRepository;
             _logger = logger;
         }
 
@@ -26,9 +26,7 @@ namespace WidgetCo.Store.Infrastructure.Services
         {
             try
             {
-                return await _dbContext.Products
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.ProductId == productId);
+                return await _productRepository.GetByIdAsync(productId);
             }
             catch (Exception ex)
             {
@@ -44,9 +42,7 @@ namespace WidgetCo.Store.Infrastructure.Services
         {
             try
             {
-                return await _dbContext.Products
-                    .AsNoTracking()
-                    .ToListAsync();
+                return await _productRepository.GetAllAsync();
             }
             catch (Exception ex)
             {
@@ -64,12 +60,7 @@ namespace WidgetCo.Store.Infrastructure.Services
             {
                 product.ValidateAndThrow();
 
-                await _dbContext.Products.AddAsync(product);
-                await _dbContext.SaveChangesAsync();
-
-                _logger.LogInformation("Created product {ProductId}", product.ProductId);
-
-                return product.ProductId;
+                return await _productRepository.AddAsync(product);
             }
             catch (Exception ex)
             {
@@ -87,22 +78,7 @@ namespace WidgetCo.Store.Infrastructure.Services
             {
                 product.ValidateAndThrow();
 
-                var existingProduct = await _dbContext.Products.FindAsync(product.ProductId);
-
-                if (existingProduct == null)
-                {
-                    throw new StoreException(
-                        "Product not found",
-                        (int)HttpStatusCode.NotFound);
-                }
-
-                // Update properties
-                existingProduct.Name = product.Name;
-                existingProduct.Price = product.Price;
-                existingProduct.Description = product.Description;
-                existingProduct.ImageUrl = product.ImageUrl;
-
-                await _dbContext.SaveChangesAsync();
+                await _productRepository.UpdateAsync(product);
 
                 _logger.LogInformation("Updated product {ProductId}", product.ProductId);
             }
@@ -110,7 +86,7 @@ namespace WidgetCo.Store.Infrastructure.Services
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not StoreException)
             {
                 _logger.LogError(ex, "Error updating product {ProductId}", product.ProductId);
                 throw new StoreException(
