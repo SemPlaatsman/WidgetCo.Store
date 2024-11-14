@@ -41,10 +41,6 @@ namespace WidgetCo.Store.Api.Controllers
             try
             {
                 var product = await _productService.GetProductByIdAsync(productId);
-                if (product == null)
-                {
-                    return NotFound();
-                }
                 return Ok(product);
             }
             catch (Exception ex)
@@ -59,7 +55,7 @@ namespace WidgetCo.Store.Api.Controllers
             try
             {
                 var productId = await _productService.CreateProductAsync(product);
-                return CreatedAtAction(nameof(GetProduct), new { productId }, new { productId });
+                return Created($"/api/products/{productId}", new { productId });
             }
             catch (Exception ex)
             {

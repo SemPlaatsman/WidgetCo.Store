@@ -26,9 +26,16 @@ namespace WidgetCo.Store.Infrastructure.Services
         {
             try
             {
-                return await _productRepository.GetByIdAsync(productId);
+                var product = await _productRepository.GetByIdAsync(productId);
+                if (product == null)
+                {
+                    throw new StoreException(
+                        $"Product with ID {productId} not found",
+                        (int)HttpStatusCode.NotFound);
+                }
+                return product;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not StoreException)
             {
                 _logger.LogError(ex, "Error retrieving product {ProductId}", productId);
                 throw new StoreException(
@@ -44,7 +51,7 @@ namespace WidgetCo.Store.Infrastructure.Services
             {
                 return await _productRepository.GetAllAsync();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not StoreException)
             {
                 _logger.LogError(ex, "Error retrieving products");
                 throw new StoreException(
@@ -62,7 +69,7 @@ namespace WidgetCo.Store.Infrastructure.Services
 
                 return await _productRepository.AddAsync(product);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not StoreException)
             {
                 _logger.LogError(ex, "Error creating product");
                 throw new StoreException(
@@ -76,15 +83,17 @@ namespace WidgetCo.Store.Infrastructure.Services
         {
             try
             {
+                // Verify product exists
+                var existingProduct = await GetProductByIdAsync(product.ProductId)
+                    ?? throw new StoreException(
+                        $"Product with ID {product.ProductId} not found",
+                        (int)HttpStatusCode.NotFound);
+
                 product.ValidateAndThrow();
 
                 await _productRepository.UpdateAsync(product);
 
                 _logger.LogInformation("Updated product {ProductId}", product.ProductId);
-            }
-            catch (StoreException)
-            {
-                throw;
             }
             catch (Exception ex) when (ex is not StoreException)
             {

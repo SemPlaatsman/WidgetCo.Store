@@ -18,7 +18,7 @@ namespace WidgetCo.Store.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Explicitly apply configurations
+            // Apply configurations
             modelBuilder.ApplyConfiguration(new ProductConfiguration());
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
         }

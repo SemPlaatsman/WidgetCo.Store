@@ -20,6 +20,7 @@ namespace WidgetCo.Store.Functions.Functions
             _logger = logger;
         }
 
+        // No restful naming for this function because it is triggered by a queue
         [Function("ProcessOrder")]
         public async Task Run(
             [QueueTrigger("order-processing")] string messageText)

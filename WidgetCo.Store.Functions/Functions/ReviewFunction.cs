@@ -1,6 +1,5 @@
 using System.Net;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using System.Text.Json;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Models;
@@ -31,7 +30,7 @@ namespace WidgetCo.Store.Functions.Functions
 
         [Function("AddReview")]
         public async Task<IActionResult> AddReview(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "reviews")] HttpRequest req)
         {
             try
             {

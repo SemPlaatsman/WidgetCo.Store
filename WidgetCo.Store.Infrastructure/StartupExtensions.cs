@@ -19,6 +19,9 @@ namespace WidgetCo.Store.Infrastructure
             services.Configure<StorageOptions>(
                 configuration.GetSection(StorageOptions.SectionName));
 
+            services.Configure<BlobStorageOptions>(
+                configuration.GetSection(BlobStorageOptions.SectionName));
+
             return services;
         }
 

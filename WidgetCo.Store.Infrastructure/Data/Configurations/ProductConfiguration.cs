@@ -27,7 +27,7 @@ namespace WidgetCo.Store.Infrastructure.Data.Configurations
 
             builder.Property(p => p.ImageUrl)
                 .IsRequired()
-                .HasMaxLength(2048); // Generous max length for URLs
+                .HasMaxLength(2048);
         }
     }
 }
