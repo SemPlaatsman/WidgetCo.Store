@@ -1,13 +1,12 @@
-using System.Net;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
-using System.Text;
-using WidgetCo.Store.Core.Interfaces;
-using WidgetCo.Store.Core.Exceptions;
-using System.Web;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net;
+using WidgetCo.Store.Core.DTOs.Images;
+using WidgetCo.Store.Core.Exceptions;
+using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Options;
 
 namespace WidgetCo.Store.Functions
@@ -51,7 +50,7 @@ namespace WidgetCo.Store.Functions
                 var imageUrl = await _imageService.UploadImageAsync(stream, file.FileName);
 
                 var response = req.CreateResponse(HttpStatusCode.Created);
-                await response.WriteAsJsonAsync(new { imageUrl });
+                await response.WriteAsJsonAsync(new UploadImageResponse(imageUrl));
                 return response;
             }
             catch (StoreException ex)
@@ -78,12 +77,12 @@ namespace WidgetCo.Store.Functions
             {
                 var imageUrls = await _imageService.GetAllImageUrlsAsync();
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(imageUrls);
+                await response.WriteAsJsonAsync(new ImageUrlsResponse(imageUrls));
                 return response;
             }
             catch (StoreException ex)
             {
-                _logger.LogWarning(ex, "Store exception occurred while uploading image");
+                _logger.LogWarning(ex, "Store exception occurred while retrieving images");
                 return await CreateErrorResponse(req, ex.StatusCode, ex.Message,
                     _apiOptions.ReturnDetailedErrors ? ex.DetailedMessage : null);
             }

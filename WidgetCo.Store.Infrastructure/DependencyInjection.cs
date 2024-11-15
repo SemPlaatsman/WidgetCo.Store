@@ -12,6 +12,7 @@ using WidgetCo.Store.Infrastructure.Services;
 using WidgetCo.Store.Infrastructure.Storage.Interfaces;
 using WidgetCo.Store.Infrastructure.Storage;
 using WidgetCo.Store.Infrastructure.Handlers;
+using WidgetCo.Store.Core.Interfaces.Storage;
 
 namespace WidgetCo.Store.Infrastructure
 {
@@ -29,6 +30,7 @@ namespace WidgetCo.Store.Infrastructure
             // Register repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IReviewRepository, ReviewRepository>();
+            services.AddScoped<IImageRepository, ImageRepository>();
 
             // Register CQRS
             services.AddScoped<IQueryHandler<GetProductByIdQuery, ProductDto?>, GetProductByIdQueryHandler>();
