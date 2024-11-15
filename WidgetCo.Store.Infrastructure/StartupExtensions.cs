@@ -19,8 +19,8 @@ namespace WidgetCo.Store.Infrastructure
             services.Configure<ReviewStorageOptions>(
                 configuration.GetSection(ReviewStorageOptions.SectionName));
 
-            services.Configure<BlobStorageOptions>(
-                configuration.GetSection(BlobStorageOptions.SectionName));
+            services.Configure<ProductImageStorageOptions>(
+                configuration.GetSection(ProductImageStorageOptions.SectionName));
 
             return services;
         }

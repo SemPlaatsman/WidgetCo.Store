@@ -13,11 +13,11 @@ namespace WidgetCo.Store.Infrastructure.Services
     public class ProductImageService : IProductImageService
     {
         private readonly BlobContainerClient _containerClient;
+        private readonly ProductImageStorageOptions _options;
         private readonly ILogger<ProductImageService> _logger;
-        private readonly BlobStorageOptions _options;
 
         public ProductImageService(
-            IOptions<BlobStorageOptions> options,
+            IOptions<ProductImageStorageOptions> options,
             ILogger<ProductImageService> logger)
         {
             _options = options.Value;

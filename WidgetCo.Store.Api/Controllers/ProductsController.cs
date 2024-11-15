@@ -3,6 +3,9 @@ using WidgetCo.Store.Core.Models;
 using WidgetCo.Store.Core.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using WidgetCo.Store.Core.DTOs.Products;
+using WidgetCo.Store.Core.Commands;
+using Azure.Core;
 
 namespace WidgetCo.Store.Api.Controllers
 {
@@ -22,6 +25,7 @@ namespace WidgetCo.Store.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllProducts()
         {
             try
@@ -36,6 +40,8 @@ namespace WidgetCo.Store.Api.Controllers
         }
 
         [HttpGet("{productId}")]
+        [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProduct(string productId)
         {
             try
@@ -50,12 +56,21 @@ namespace WidgetCo.Store.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct(Product product)
+        [ProducesResponseType(typeof(CreateProductResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateProduct(CreateProductRequest request)
         {
             try
             {
-                var productId = await _productService.CreateProductAsync(product);
-                return Created($"/api/products/{productId}", new { productId });
+                var command = new CreateProductCommand(
+                    request.Name,
+                    request.Price,
+                    request.Description,
+                    request.ImageUrl
+                );
+
+                var productId = await _productService.CreateProductAsync(command);
+                return Created($"/api/products/{productId}", new CreateProductResponse(productId));
             }
             catch (Exception ex)
             {
@@ -64,16 +79,27 @@ namespace WidgetCo.Store.Api.Controllers
         }
 
         [HttpPut("{productId}")]
-        public async Task<IActionResult> UpdateProduct(string productId, Product product)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateProduct(string productId, UpdateProductRequest request)
         {
             try
             {
-                if (productId != product.Id)
+                if (productId != request.Id)
                 {
                     return BadRequest("ProductId mismatch");
                 }
 
-                await _productService.UpdateProductAsync(product);
+                var command = new UpdateProductCommand(
+                    request.Id,
+                    request.Name,
+                    request.Price,
+                    request.Description,
+                    request.ImageUrl
+                );
+
+                await _productService.UpdateProductAsync(command);
                 return NoContent();
             }
             catch (Exception ex)

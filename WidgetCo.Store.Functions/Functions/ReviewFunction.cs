@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 using WidgetCo.Store.Core.Options;
 using Microsoft.Extensions.Options;
 using WidgetCo.Store.Core.Exceptions;
+using WidgetCo.Store.Core.Commands;
+using WidgetCo.Store.Core.DTOs.Reviews;
+using WidgetCo.Store.Core.Queries;
 
 namespace WidgetCo.Store.Functions.Functions
 {
@@ -35,12 +38,18 @@ namespace WidgetCo.Store.Functions.Functions
             try
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var review = JsonSerializer.Deserialize<Review>(
+                var request = JsonSerializer.Deserialize<CreateReviewRequest>(
                     requestBody,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                await _reviewService.AddReviewAsync(review);
-                return new CreatedResult(string.Empty, new { message = "Review added successfully" });
+                var command = new CreateReviewCommand(
+                    request.ProductId,
+                    request.ReviewText,
+                    request.Rating
+                );
+
+                var reviewId = await _reviewService.CreateReviewAsync(command);
+                return new CreatedResult(string.Empty, new CreateReviewResponse(reviewId));
             }
             catch (StoreException ex)
             {
@@ -74,7 +83,8 @@ namespace WidgetCo.Store.Functions.Functions
         {
             try
             {
-                var reviews = await _reviewService.GetProductReviewsAsync(productId);
+                var query = new GetProductReviewsQuery(productId);
+                var reviews = await _reviewService.GetProductReviewsAsync(query);
                 return new OkObjectResult(reviews);
             }
             catch (StoreException ex)
