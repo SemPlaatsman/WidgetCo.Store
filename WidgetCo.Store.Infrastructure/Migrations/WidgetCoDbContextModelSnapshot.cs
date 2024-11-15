@@ -24,7 +24,7 @@ namespace WidgetCo.Store.Infrastructure.Migrations
 
             modelBuilder.Entity("WidgetCo.Store.Core.Models.Order", b =>
                 {
-                    b.Property<string>("OrderId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedDate")
@@ -43,7 +43,7 @@ namespace WidgetCo.Store.Infrastructure.Migrations
                     b.Property<DateTime?>("ShippedDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("OrderId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
 
@@ -54,7 +54,7 @@ namespace WidgetCo.Store.Infrastructure.Migrations
 
             modelBuilder.Entity("WidgetCo.Store.Core.Models.Product", b =>
                 {
-                    b.Property<string>("ProductId")
+                    b.Property<string>("Id")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -75,7 +75,7 @@ namespace WidgetCo.Store.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("ProductId");
+                    b.HasKey("Id");
 
                     b.ToTable("Products");
                 });

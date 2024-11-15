@@ -1,11 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Net;
 using WidgetCo.Store.Core.Exceptions;
 using WidgetCo.Store.Core.Extensions;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Models;
-using WidgetCo.Store.Infrastructure.Data;
 
 namespace WidgetCo.Store.Infrastructure.Services
 {
@@ -84,20 +82,20 @@ namespace WidgetCo.Store.Infrastructure.Services
             try
             {
                 // Verify product exists
-                var existingProduct = await GetProductByIdAsync(product.ProductId)
-                    ?? throw new StoreException(
-                        $"Product with ID {product.ProductId} not found",
+                if (await _productRepository.GetByIdAsync(product.Id) == null)
+                {
+                    throw new StoreException(
+                        $"Product with ID {product.Id} not found",
                         (int)HttpStatusCode.NotFound);
+                }
 
                 product.ValidateAndThrow();
-
                 await _productRepository.UpdateAsync(product);
-
-                _logger.LogInformation("Updated product {ProductId}", product.ProductId);
+                _logger.LogInformation("Updated product {ProductId}", product.Id);
             }
             catch (Exception ex) when (ex is not StoreException)
             {
-                _logger.LogError(ex, "Error updating product {ProductId}", product.ProductId);
+                _logger.LogError(ex, "Error updating product {ProductId}", product.Id);
                 throw new StoreException(
                     "Error updating product",
                     (int)HttpStatusCode.InternalServerError,

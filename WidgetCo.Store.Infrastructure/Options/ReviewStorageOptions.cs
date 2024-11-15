@@ -1,8 +1,8 @@
 ﻿namespace WidgetCo.Store.Infrastructure.Options
 {
-    public class StorageOptions
+    public class ReviewStorageOptions
     {
-        public const string SectionName = "AzureStorage";
+        public const string SectionName = "ReviewStorage";
         public string ConnectionString { get; set; } = string.Empty;
     }
 }

@@ -19,7 +19,7 @@ namespace WidgetCo.Store.Infrastructure.Services
         private const string TableName = "ProductReviews";
 
         public ReviewService(
-            IOptions<StorageOptions> options,
+            IOptions<ReviewStorageOptions> options,
             ILogger<ReviewService> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

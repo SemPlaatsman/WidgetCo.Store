@@ -8,9 +8,9 @@ namespace WidgetCo.Store.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
-            builder.HasKey(p => p.ProductId);
+            builder.HasKey(p => p.Id);
 
-            builder.Property(p => p.ProductId)
+            builder.Property(p => p.Id)
                 .IsRequired()
                 .HasMaxLength(50);
 

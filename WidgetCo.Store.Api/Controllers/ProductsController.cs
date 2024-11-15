@@ -68,7 +68,7 @@ namespace WidgetCo.Store.Api.Controllers
         {
             try
             {
-                if (productId != product.ProductId)
+                if (productId != product.Id)
                 {
                     return BadRequest("ProductId mismatch");
                 }

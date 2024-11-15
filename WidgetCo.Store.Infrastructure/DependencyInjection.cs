@@ -12,15 +12,14 @@ namespace WidgetCo.Store.Infrastructure
         {
             // Register services
             services.AddScoped<IReviewService, ReviewService>();
-
             services.AddScoped<IOrderService, OrderService>();
-
             services.AddScoped<IProductService, ProductService>();
-
             services.AddScoped<IProductImageService, ProductImageService>();
 
             // Register repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+            // Register CQRS
 
             return services;
         }

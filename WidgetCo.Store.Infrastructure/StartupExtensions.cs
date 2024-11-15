@@ -16,8 +16,8 @@ namespace WidgetCo.Store.Infrastructure
             services.Configure<ApiOptions>(
                 configuration.GetSection(ApiOptions.SectionName));
 
-            services.Configure<StorageOptions>(
-                configuration.GetSection(StorageOptions.SectionName));
+            services.Configure<ReviewStorageOptions>(
+                configuration.GetSection(ReviewStorageOptions.SectionName));
 
             services.Configure<BlobStorageOptions>(
                 configuration.GetSection(BlobStorageOptions.SectionName));
@@ -31,7 +31,7 @@ namespace WidgetCo.Store.Infrastructure
         {
             services.AddDbContext<WidgetCoDbContext>(options =>
                 options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection"),
+                    configuration.GetConnectionString("SqlSeverConnectionString"),
                     b => b.MigrationsAssembly(typeof(WidgetCoDbContext).Assembly.FullName)));
 
             return services;

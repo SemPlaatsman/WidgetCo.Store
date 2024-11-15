@@ -27,7 +27,7 @@ namespace WidgetCo.Store.Infrastructure.Services
 
             _logger.LogInformation(
                 "Created order {OrderId} for customer {CustomerId}",
-                order.OrderId,
+                order.Id,
                 order.CustomerId);
 
             return orderId;
@@ -55,7 +55,7 @@ namespace WidgetCo.Store.Infrastructure.Services
         {
             var order = await _orderRepository.Query()
                 .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+                .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (order == null)
             {

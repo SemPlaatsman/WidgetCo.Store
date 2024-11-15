@@ -88,7 +88,7 @@ namespace WidgetCo.Store.Api.Controllers
 
                 return Ok(new
                 {
-                    order.OrderId,
+                    order.Id,
                     order.CustomerId,
                     order.Items,
                     order.CreatedDate,

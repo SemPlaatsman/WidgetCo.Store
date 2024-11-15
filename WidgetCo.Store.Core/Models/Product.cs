@@ -4,7 +4,7 @@ namespace WidgetCo.Store.Core.Models
 {
     public class Product
     {
-        public string ProductId { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [Required(ErrorMessage = "Name is required")]
         [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]

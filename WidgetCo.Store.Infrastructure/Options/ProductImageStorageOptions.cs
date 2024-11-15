@@ -1,6 +1,6 @@
 ﻿namespace WidgetCo.Store.Core.Options
 {
-    public class BlobStorageOptions
+    public class ProductImageStorageOptions
     {
         public const string SectionName = "BlobStorage";
         public string ConnectionString { get; set; } = string.Empty;
