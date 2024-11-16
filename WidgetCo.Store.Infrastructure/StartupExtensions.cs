@@ -22,6 +22,9 @@ namespace WidgetCo.Store.Infrastructure
             services.Configure<ProductImageStorageOptions>(
                 configuration.GetSection(ProductImageStorageOptions.SectionName));
 
+            services.Configure<OrderStorageOptions>(
+                configuration.GetSection(OrderStorageOptions.SectionName));
+
             return services;
         }
 

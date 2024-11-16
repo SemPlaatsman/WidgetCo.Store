@@ -3,22 +3,35 @@ using System.Net;
 using WidgetCo.Store.Core.Exceptions;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Models;
-using WidgetCo.Store.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Azure.Storage.Queues;
+using System.Text.Json;
+using WidgetCo.Store.Infrastructure.Model;
+using Microsoft.Extensions.Options;
+using WidgetCo.Store.Infrastructure.Options;
 
 namespace WidgetCo.Store.Infrastructure.Services
 {
     public class OrderService : IOrderService
     {
         private readonly IRepository<Order> _orderRepository;
+        private readonly IProductService _productService;
+        private readonly QueueClient _queueClient;
         private readonly ILogger<OrderService> _logger;
 
         public OrderService(
             IRepository<Order> orderRepository,
+            IProductService productService,
+            IOptions<OrderStorageOptions> options,
             ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
+            _productService = productService;
             _logger = logger;
+            _queueClient = new QueueClient(
+                options.Value.ConnectionString,
+                options.Value.QueueName);
+            _queueClient.CreateIfNotExists();
         }
 
         public async Task<string> CreateOrderAsync(Order order)
@@ -33,22 +46,43 @@ namespace WidgetCo.Store.Infrastructure.Services
             return orderId;
         }
 
-        public async Task<Order> GetOrderByRequestIdAsync(string orderRequestId)
+        public async Task<string> InitiateOrderAsync(OrderRequest request)
         {
-            // Using the Query() method for custom queries
-            var order = await _orderRepository.Query()
-                .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.OrderRequestId == orderRequestId);
-
-
-            if (order == null)
+            // Validate products exist
+            foreach (var item in request.Items)
             {
-                throw new StoreException(
-                    "Order not found",
-                    (int)HttpStatusCode.NotFound);
+                var product = await _productService.GetProductByIdAsync(item.ProductId);
+                if (product == null)
+                {
+                    throw new StoreException(
+                        $"Product {item.ProductId} not found",
+                        (int)HttpStatusCode.BadRequest);
+                }
             }
 
-            return order;
+            // Create queue message
+            var message = new OrderProcessingMessage
+            {
+                CustomerId = request.CustomerId,
+                Items = request.Items
+            };
+
+            // Add to queue
+            await _queueClient.SendMessageAsync(JsonSerializer.Serialize(message));
+
+            _logger.LogInformation(
+                "Initiated order request {OrderRequestId} for customer {CustomerId}",
+                message.OrderRequestId,
+                request.CustomerId);
+
+            return message.OrderRequestId;
+        }
+
+        public async Task<Order?> GetOrderByRequestIdAsync(string orderRequestId)
+        {
+            return await _orderRepository.Query()
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.OrderRequestId == orderRequestId);
         }
 
         public async Task<Order> GetOrderAsync(string orderId)
