@@ -16,14 +16,12 @@ namespace WidgetCo.Store.Infrastructure.Services
     {
         private readonly IRepository<Order> _orderRepository;
         private readonly IProductService _productService;
-        private readonly QueueClient _queueClient;
         private readonly IOrderMessageService _orderMessageService;
         private readonly ILogger<OrderService> _logger;
 
         public OrderService(
             IRepository<Order> orderRepository,
             IProductService productService,
-            IOptions<OrderStorageOptions> options,
             IOrderMessageService orderMessageService,
             ILogger<OrderService> logger)
         {
@@ -31,10 +29,6 @@ namespace WidgetCo.Store.Infrastructure.Services
             _productService = productService;
             _orderMessageService = orderMessageService;
             _logger = logger;
-            _queueClient = new QueueClient(
-                options.Value.ConnectionString,
-                options.Value.QueueName);
-            _queueClient.CreateIfNotExists();
         }
 
         public async Task<string> CreateOrderAsync(Order order)
