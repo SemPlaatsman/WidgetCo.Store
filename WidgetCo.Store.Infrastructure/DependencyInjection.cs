@@ -26,6 +26,7 @@ namespace WidgetCo.Store.Infrastructure
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IProductImageService, ProductImageService>();
+            services.AddScoped<IOrderMessageService, OrderMessageService>();
 
             // Register repositories
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

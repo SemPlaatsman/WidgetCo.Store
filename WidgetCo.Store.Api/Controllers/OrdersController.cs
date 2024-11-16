@@ -31,11 +31,7 @@ namespace WidgetCo.Store.Api.Controllers
                 return AcceptedAtAction(
                     nameof(GetOrder),
                     new { orderRequestId },
-                    new
-                    {
-                        message = "Order request accepted",
-                        trackingId = orderRequestId
-                    });
+                    new { requestId = orderRequestId });
             }
             catch (Exception ex)
             {
@@ -54,7 +50,7 @@ namespace WidgetCo.Store.Api.Controllers
                     return AcceptedAtAction(
                         nameof(GetOrder),
                         new { orderRequestId },
-                        new { message = "Order is being processed" });
+                        new { requestId = orderRequestId });
                 }
 
                 return Ok(new
@@ -63,8 +59,7 @@ namespace WidgetCo.Store.Api.Controllers
                     order.CustomerId,
                     order.Items,
                     order.CreatedDate,
-                    order.ShippedDate,
-                    Status = GetOrderStatus(order)
+                    order.ShippedDate
                 });
             }
             catch (Exception ex)
@@ -79,17 +74,12 @@ namespace WidgetCo.Store.Api.Controllers
             try
             {
                 await _orderService.ShipOrderAsync(orderId);
-                return Ok(new { message = "Order marked as shipped" });
+                return NoContent();
             }
             catch (Exception ex)
             {
                 return HandleException(ex, "shipping order");
             }
-        }
-
-        private static string GetOrderStatus(Order order)
-        {
-            return order.ShippedDate != null ? "Shipped" : "Created";
         }
     }
 }

@@ -34,7 +34,7 @@ namespace WidgetCo.Store.Infrastructure
         {
             services.AddDbContext<WidgetCoDbContext>(options =>
                 options.UseSqlServer(
-                    configuration.GetConnectionString("SqlSeverConnectionString"),
+                    configuration.GetConnectionString("SqlServerConnectionString"),
                     b => b.MigrationsAssembly(typeof(WidgetCoDbContext).Assembly.FullName)));
 
             return services;

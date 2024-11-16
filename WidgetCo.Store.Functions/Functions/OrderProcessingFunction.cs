@@ -24,28 +24,17 @@ namespace WidgetCo.Store.Functions.Functions
             _orderService = orderService;
             _options = options.Value;
             _logger = logger;
-
-            _logger.LogInformation("Constructor!!!!!!!!!!!!!!!");
         }
 
         // No restful naming for this function because it is triggered by a queue
         [Function("ProcessOrder")]
-        public async Task Run(
-            [QueueTrigger("orderprocessing")] string messageText,
-            FunctionContext context)
-            //[QueueTrigger("%OrderStorage:QueueName%")] string messageText)
+        public async Task Run([QueueTrigger("order-processing", Connection = "OrderStorage:ConnectionString")] string messageText)
         {
-            Debug.WriteLine($"Processing message: {messageText}");
             _logger.LogInformation("Processing message: {MessageText}", messageText);
 
             OrderProcessingMessage? message;
             try
             {
-                //var options = new JsonSerializerOptions
-                //{
-                //    PropertyNameCaseInsensitive = true
-                //};
-                //message = JsonSerializer.Deserialize<OrderProcessingMessage>(messageText, options);
                 message = JsonSerializer.Deserialize<OrderProcessingMessage>(messageText);
 
                 if (message == null)

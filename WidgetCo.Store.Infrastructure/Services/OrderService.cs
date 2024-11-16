@@ -17,16 +17,19 @@ namespace WidgetCo.Store.Infrastructure.Services
         private readonly IRepository<Order> _orderRepository;
         private readonly IProductService _productService;
         private readonly QueueClient _queueClient;
+        private readonly IOrderMessageService _orderMessageService;
         private readonly ILogger<OrderService> _logger;
 
         public OrderService(
             IRepository<Order> orderRepository,
             IProductService productService,
             IOptions<OrderStorageOptions> options,
+            IOrderMessageService orderMessageService,
             ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
             _productService = productService;
+            _orderMessageService = orderMessageService;
             _logger = logger;
             _queueClient = new QueueClient(
                 options.Value.ConnectionString,
@@ -60,6 +63,7 @@ namespace WidgetCo.Store.Infrastructure.Services
                 }
             }
 
+
             // Create queue message
             var message = new OrderProcessingMessage
             {
@@ -68,7 +72,7 @@ namespace WidgetCo.Store.Infrastructure.Services
             };
 
             // Add to queue
-            await _queueClient.SendMessageAsync(JsonSerializer.Serialize(message));
+            await _orderMessageService.SendOrderProcessingMessageAsync(JsonSerializer.Serialize(message));
 
             _logger.LogInformation(
                 "Initiated order request {OrderRequestId} for customer {CustomerId}",

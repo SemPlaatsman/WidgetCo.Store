@@ -18,8 +18,8 @@ namespace WidgetCo.Store.Infrastructure.Data
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<WidgetCoDbContext>();
-            var connectionString = configuration.GetConnectionString("SqlSeverConnectionString")
-                ?? throw new InvalidOperationException("Connection string 'SqlSeverConnectionString' not found.");
+            var connectionString = configuration.GetConnectionString("SqlServerConnectionString")
+                ?? throw new InvalidOperationException("Connection string 'SqlServerConnectionString' not found.");
 
             optionsBuilder.UseSqlServer(connectionString, b =>
                 b.MigrationsAssembly(typeof(WidgetCoDbContext).Assembly.FullName));
