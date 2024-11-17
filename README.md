@@ -69,6 +69,40 @@ flowchart TB
 
 You can also checkout the mermaid chart file [here](./docs/architecture.mmd). 
 
+## Architecture Design Rationale
+
+The application uses Azure Functions for three specific components, each chosen for distinct reasons:
+
+### Review Functions
+Reviews are handled by serverless functions because:
+1. **Anonymous Access**: The project requires anonymous product reviews, making it ideal to separate this from the main authenticated application
+2. **Separate Storage**: Reviews are stored in Table Storage rather than SQL as they're intended for future marketing analysis, not core business operations
+3. **Scalability**: Review submission patterns can be unpredictable and spiky, making serverless functions ideal for cost-effective scaling
+4. **Future Analytics**: Since reviews will be used for product range profiling later, having them in Table Storage with Azure Functions makes it easier to integrate with future analytics services
+
+### Order Processing Function
+Order processing is implemented as a queue-triggered function because:
+1. **Peak Performance**: As noted in the project requirements, order placement was "the main culprit in sluggish performance"
+2. **Asynchronous Processing**: Using a queue-triggered function allows the API to quickly accept orders and respond to users while processing happens asynchronously
+3. **Load Leveling**: The queue acts as a buffer during peak hours, preventing the database from being overwhelmed
+4. **Reliability**: Queue storage ensures no orders are lost even during high load periods
+
+### Image Functions
+Product images are handled by separate functions because:
+1. **Resource Intensive**: Image processing and storage operations can be computationally expensive
+3. **Specialized Storage**: Images are stored in Blob Storage, which is optimized for large binary files
+4. **Independent Scaling**: Image processing can scale independently of the main application
+5. **Cost Optimization**: Since image operations are infrequent, serverless functions prevent paying for idle resources
+
+This architecture aligns with the project requirements of:
+- Handling heavy loads at peak hours
+- Improving the order placement process
+- Supporting anonymous product reviews
+- Separating review data for future marketing analysis
+- Managing product images efficiently
+
+Each function type is designed to handle specific concerns independently, allowing for better scalability, maintenance, and cost management in the cloud environment.
+
 ## Project Structure
 
 - `Api/` - Web API project
