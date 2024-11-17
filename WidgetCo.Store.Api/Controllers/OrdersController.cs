@@ -49,6 +49,7 @@ namespace WidgetCo.Store.Api.Controllers
         }
 
         [HttpGet("{orderRequestId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetOrder(string orderRequestId)
         {
             try
