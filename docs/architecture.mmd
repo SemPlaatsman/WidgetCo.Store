@@ -1,0 +1,54 @@
+flowchart TB
+    subgraph Client
+        API[Web API]
+    end
+
+    subgraph Azure Functions
+        subgraph ReviewFunction
+            AR[AddReview]
+            GPR[GetProductReviews]
+        end
+        subgraph ProductImageFunction
+            GPI[GetProductImages]
+            UPI[UploadProductImage]
+        end
+        subgraph OrderProcessingFunction
+            PO[ProcessOrder]
+        end
+    end
+
+    subgraph Storage
+        subgraph "Core Business Data"
+            SQL[(SQL Database)]
+            BLOB[Blob Storage]
+        end
+        subgraph "Processing & Reviews"
+            QUEUE[Storage Queue]
+            REVIEW_TABLE[Review Table Storage]
+        end
+    end
+
+    subgraph "SQL Database Tables"
+        PRODUCTS[Products]
+        ORDERS[Orders]
+    end
+
+    %% Client to Function connections
+    API --> AR
+    API --> GPR
+    API --> GPI
+    API --> UPI
+    API --> SQL
+    API --> QUEUE
+
+    %% Function to Storage connections
+    AR --> REVIEW_TABLE
+    GPR --> REVIEW_TABLE
+    GPI --> BLOB
+    UPI --> BLOB
+    PO --> SQL
+    QUEUE --> PO
+
+    %% SQL relationships
+    SQL --- PRODUCTS
+    SQL --- ORDERS

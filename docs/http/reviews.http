@@ -1,0 +1,9 @@
+@WidgetCo.Store.Functions_HostAddress = http://localhost:7164
+
+GET {{WidgetCo.Store.Functions_HostAddress}}/api/reviews/{productId}
+
+###
+
+POST {{WidgetCo.Store.Functions_HostAddress}}/api/reviews
+
+###

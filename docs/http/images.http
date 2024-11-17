@@ -1,0 +1,9 @@
+@WidgetCo.Store.Functions_HostAddress = http://localhost:7164
+
+POST {{WidgetCo.Store.Functions_HostAddress}}/api/images
+
+###
+
+GET {{WidgetCo.Store.Functions_HostAddress}}/api/images
+
+###

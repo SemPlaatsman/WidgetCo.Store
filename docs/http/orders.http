@@ -1,0 +1,18 @@
+@WidgetCo.Store.Api_HostAddress = https://localhost:7169
+
+POST {{WidgetCo.Store.Api_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  //CreateOrderRequest
+}
+
+###
+
+POST {{WidgetCo.Store.Api_HostAddress}}/api/orders/string/ship
+
+###
+
+GET {{WidgetCo.Store.Api_HostAddress}}/api/orders/string
+
+###

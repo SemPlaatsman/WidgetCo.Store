@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - main
+  workflow_dispatch:
 env:
   AZURE_WEBAPP_NAME: widgetco-api
   AZURE_WEBAPP_PACKAGE_PATH: WidgetCo.Store.Api\published
