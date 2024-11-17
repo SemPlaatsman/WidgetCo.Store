@@ -1,4 +1,5 @@
-﻿namespace WidgetCo.Store.Core.Interfaces.Storage
+﻿// Storage related interfaces are kept seperate from the Core interfaces since they are a data concern and not a domain concern. 
+namespace WidgetCo.Store.Infrastructure.Interfaces.Storage
 {
     public interface IImageRepository
     {

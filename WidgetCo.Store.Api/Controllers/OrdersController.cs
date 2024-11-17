@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using WidgetCo.Store.Core.Commands;
+using WidgetCo.Store.Core.DTOs.Orders;
 using WidgetCo.Store.Core.Interfaces;
-using WidgetCo.Store.Core.Models;
 using WidgetCo.Store.Core.Options;
+using WidgetCo.Store.Core.Queries;
 
 namespace WidgetCo.Store.Api.Controllers
 {
@@ -22,16 +24,21 @@ namespace WidgetCo.Store.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrder(OrderRequest request)
+        public async Task<IActionResult> CreateOrder(CreateOrderRequest request)
         {
             try
             {
-                var orderRequestId = await _orderService.InitiateOrderAsync(request);
+                var command = new InitiateOrderCommand(
+                    request.CustomerId,
+                    request.Items
+                );
+
+                var orderRequestId = await _orderService.InitiateOrderAsync(command);
 
                 return AcceptedAtAction(
                     nameof(GetOrder),
                     new { orderRequestId },
-                    new { requestId = orderRequestId });
+                    new OrderStatusResponse(orderRequestId));
             }
             catch (Exception ex)
             {
@@ -44,23 +51,12 @@ namespace WidgetCo.Store.Api.Controllers
         {
             try
             {
-                var order = await _orderService.GetOrderByRequestIdAsync(orderRequestId);
-                if (order == null)
-                {
-                    return AcceptedAtAction(
-                        nameof(GetOrder),
-                        new { orderRequestId },
-                        new { requestId = orderRequestId });
-                }
+                var query = new GetOrderByRequestIdQuery(orderRequestId);
+                var order = await _orderService.GetOrderByRequestIdAsync(query);
 
-                return Ok(new
-                {
-                    order.Id,
-                    order.CustomerId,
-                    order.Items,
-                    order.CreatedDate,
-                    order.ShippedDate
-                });
+                return Ok(new OrderStatusResponse(
+                    orderRequestId,
+                    order));
             }
             catch (Exception ex)
             {
@@ -73,7 +69,8 @@ namespace WidgetCo.Store.Api.Controllers
         {
             try
             {
-                await _orderService.ShipOrderAsync(orderId);
+                var command = new ShipOrderCommand(orderId);
+                await _orderService.ShipOrderAsync(command);
                 return NoContent();
             }
             catch (Exception ex)

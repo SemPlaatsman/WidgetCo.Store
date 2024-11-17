@@ -1,13 +1,16 @@
-﻿using WidgetCo.Store.Core.Models;
+﻿using WidgetCo.Store.Core.Commands;
+using WidgetCo.Store.Core.DTOs.Orders;
+using WidgetCo.Store.Core.Models;
+using WidgetCo.Store.Core.Queries;
 
 namespace WidgetCo.Store.Core.Interfaces
 {
     public interface IOrderService
     {
-        Task<string> CreateOrderAsync(Order order);
-        Task<string> InitiateOrderAsync(OrderRequest request);
-        Task<Order?> GetOrderByRequestIdAsync(string orderRequestId);
-        Task<Order> GetOrderAsync(string orderId);
-        Task ShipOrderAsync(string orderId);
+        Task<string> InitiateOrderAsync(InitiateOrderCommand command);
+        Task<string> CreateOrderAsync(CreateOrderCommand command);
+        Task ShipOrderAsync(ShipOrderCommand command);
+        Task<OrderResponse?> GetOrderByRequestIdAsync(GetOrderByRequestIdQuery query);
+        Task<OrderResponse?> GetOrderAsync(GetOrderByIdQuery query);
     }
 }

@@ -7,7 +7,7 @@ using WidgetCo.Store.Infrastructure.Options;
 using WidgetCo.Store.Infrastructure.Storage.Entities;
 using WidgetCo.Store.Infrastructure.Storage.Interfaces;
 
-namespace WidgetCo.Store.Infrastructure.Storage
+namespace WidgetCo.Store.Infrastructure.Storage.Repositories
 {
     public class ReviewRepository : IReviewRepository
     {

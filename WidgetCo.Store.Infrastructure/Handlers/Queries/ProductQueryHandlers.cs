@@ -1,24 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Net;
 using WidgetCo.Store.Core.DTOs.Products;
 using WidgetCo.Store.Core.Exceptions;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Queries;
-using WidgetCo.Store.Infrastructure.Data;
+using WidgetCo.Store.Infrastructure.Storage.Interfaces;
 
 namespace WidgetCo.Store.Infrastructure.Handlers.Queries
 {
     public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ProductDto?>
     {
-        private readonly WidgetCoDbContext _context;
+        private readonly IProductRepository _productRepository;
         private readonly ILogger<GetProductByIdQueryHandler> _logger;
 
         public GetProductByIdQueryHandler(
-            WidgetCoDbContext context,
+            IProductRepository productRepository,
             ILogger<GetProductByIdQueryHandler> logger)
         {
-            _context = context;
+            _productRepository = productRepository;
             _logger = logger;
         }
 
@@ -26,14 +25,8 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Queries
         {
             try
             {
-                var product = await _context.Products
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.Id == query.Id);
-
-                if (product == null)
-                {
-                    return null;
-                }
+                var product = await _productRepository.GetByIdAsync(query.Id);
+                if (product == null) return null;
 
                 return new ProductDto(
                     product.Id,
@@ -56,14 +49,14 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Queries
 
     public class GetAllProductsQueryHandler : IQueryHandler<GetAllProductsQuery, IEnumerable<ProductDto>>
     {
-        private readonly WidgetCoDbContext _context;
+        private readonly IProductRepository _productRepository;
         private readonly ILogger<GetAllProductsQueryHandler> _logger;
 
         public GetAllProductsQueryHandler(
-            WidgetCoDbContext context,
+            IProductRepository productRepository,
             ILogger<GetAllProductsQueryHandler> logger)
         {
-            _context = context;
+            _productRepository = productRepository;
             _logger = logger;
         }
 
@@ -71,16 +64,14 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Queries
         {
             try
             {
-                return await _context.Products
-                    .AsNoTracking()
-                    .Select(p => new ProductDto(
-                        p.Id,
-                        p.Name,
-                        p.Price,
-                        p.Description,
-                        p.ImageUrl
-                    ))
-                    .ToListAsync();
+                var products = await _productRepository.GetAllAsync();
+                return products.Select(p => new ProductDto(
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.Description,
+                    p.ImageUrl
+                ));
             }
             catch (Exception ex)
             {

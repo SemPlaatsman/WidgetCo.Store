@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Net;
 using WidgetCo.Store.Core.Commands;
 using WidgetCo.Store.Core.Common;
@@ -7,20 +6,20 @@ using WidgetCo.Store.Core.Exceptions;
 using WidgetCo.Store.Core.Extensions;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Models;
-using WidgetCo.Store.Infrastructure.Data;
+using WidgetCo.Store.Infrastructure.Storage.Interfaces;
 
 namespace WidgetCo.Store.Infrastructure.Handlers.Commands
 {
     public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, string>
     {
-        private readonly WidgetCoDbContext _context;
+        private readonly IProductRepository _productRepository;
         private readonly ILogger<CreateProductCommandHandler> _logger;
 
         public CreateProductCommandHandler(
-            WidgetCoDbContext context,
+            IProductRepository productRepository,
             ILogger<CreateProductCommandHandler> logger)
         {
-            _context = context;
+            _productRepository = productRepository;
             _logger = logger;
         }
 
@@ -37,10 +36,7 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Commands
                 };
 
                 product.ValidateAndThrow();
-                await _context.Products.AddAsync(product);
-                await _context.SaveChangesAsync();
-
-                return product.Id;
+                return await _productRepository.CreateAsync(product);
             }
             catch (Exception ex) when (ex is not StoreException)
             {
@@ -55,14 +51,14 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Commands
 
     public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, Unit>
     {
-        private readonly WidgetCoDbContext _context;
+        private readonly IProductRepository _productRepository;
         private readonly ILogger<UpdateProductCommandHandler> _logger;
 
         public UpdateProductCommandHandler(
-            WidgetCoDbContext context,
+            IProductRepository productRepository,
             ILogger<UpdateProductCommandHandler> logger)
         {
-            _context = context;
+            _productRepository = productRepository;
             _logger = logger;
         }
 
@@ -70,11 +66,7 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Commands
         {
             try
             {
-                var product = await _context.Products
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.Id == command.Id);
-
-                if (product == null)
+                if (!await _productRepository.ExistsAsync(command.Id))
                 {
                     throw new StoreException(
                         $"Product with ID {command.Id} not found",
@@ -91,8 +83,7 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Commands
                 };
 
                 updatedProduct.ValidateAndThrow();
-                _context.Products.Update(updatedProduct);
-                await _context.SaveChangesAsync();
+                await _productRepository.UpdateAsync(updatedProduct);
 
                 return Unit.Value;
             }

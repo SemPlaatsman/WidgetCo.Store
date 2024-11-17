@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using WidgetCo.Store.Core.Interfaces.Storage;
 using WidgetCo.Store.Core.Interfaces;
+using WidgetCo.Store.Infrastructure.Interfaces.Storage;
 
 namespace WidgetCo.Store.Infrastructure.Services
 {

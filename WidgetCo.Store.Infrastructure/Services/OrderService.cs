@@ -1,126 +1,100 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Net;
-using WidgetCo.Store.Core.Exceptions;
+using WidgetCo.Store.Core.Commands;
+using WidgetCo.Store.Core.Common;
+using WidgetCo.Store.Core.DTOs.Orders;
 using WidgetCo.Store.Core.Interfaces;
-using WidgetCo.Store.Core.Models;
-using Microsoft.EntityFrameworkCore;
-using Azure.Storage.Queues;
-using System.Text.Json;
-using WidgetCo.Store.Infrastructure.Model;
-using Microsoft.Extensions.Options;
-using WidgetCo.Store.Infrastructure.Options;
+using WidgetCo.Store.Core.Queries;
 
 namespace WidgetCo.Store.Infrastructure.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly IRepository<Order> _orderRepository;
-        private readonly IProductService _productService;
-        private readonly IOrderMessageService _orderMessageService;
+        private readonly ICommandHandler<InitiateOrderCommand, string> _initiateOrderHandler;
+        private readonly ICommandHandler<CreateOrderCommand, string> _createOrderHandler;
+        private readonly ICommandHandler<ShipOrderCommand, Unit> _shipOrderHandler;
+        private readonly IQueryHandler<GetOrderByRequestIdQuery, OrderResponse?> _getByRequestIdHandler;
+        private readonly IQueryHandler<GetOrderByIdQuery, OrderResponse?> _getByIdHandler;
         private readonly ILogger<OrderService> _logger;
 
         public OrderService(
-            IRepository<Order> orderRepository,
-            IProductService productService,
-            IOrderMessageService orderMessageService,
+            ICommandHandler<InitiateOrderCommand, string> initiateOrderHandler,
+            ICommandHandler<CreateOrderCommand, string> createOrderHandler,
+            ICommandHandler<ShipOrderCommand, Unit> shipOrderHandler,
+            IQueryHandler<GetOrderByRequestIdQuery, OrderResponse?> getByRequestIdHandler,
+            IQueryHandler<GetOrderByIdQuery, OrderResponse?> getByIdHandler,
             ILogger<OrderService> logger)
         {
-            _orderRepository = orderRepository;
-            _productService = productService;
-            _orderMessageService = orderMessageService;
+            _initiateOrderHandler = initiateOrderHandler;
+            _createOrderHandler = createOrderHandler;
+            _shipOrderHandler = shipOrderHandler;
+            _getByRequestIdHandler = getByRequestIdHandler;
+            _getByIdHandler = getByIdHandler;
             _logger = logger;
         }
 
-        public async Task<string> CreateOrderAsync(Order order)
+        public async Task<string> InitiateOrderAsync(InitiateOrderCommand command)
         {
-            var orderId = await _orderRepository.AddAsync(order);
-
-            _logger.LogInformation(
-                "Created order {OrderId} for customer {CustomerId}",
-                order.Id,
-                order.CustomerId);
-
-            return orderId;
+            try
+            {
+                return await _initiateOrderHandler.HandleAsync(command);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error initiating order for customer {CustomerId}", command.CustomerId);
+                throw;
+            }
         }
 
-        public async Task<string> InitiateOrderAsync(OrderRequest request)
+        public async Task<string> CreateOrderAsync(CreateOrderCommand command)
         {
-            // Validate products exist
-            foreach (var item in request.Items)
+            try
             {
-                var product = await _productService.GetProductByIdAsync(item.ProductId);
-                if (product == null)
-                {
-                    throw new StoreException(
-                        $"Product {item.ProductId} not found",
-                        (int)HttpStatusCode.BadRequest);
-                }
+                return await _createOrderHandler.HandleAsync(command);
             }
-
-
-            // Create queue message
-            var message = new OrderProcessingMessage
+            catch (Exception ex)
             {
-                CustomerId = request.CustomerId,
-                Items = request.Items
-            };
-
-            // Add to queue
-            await _orderMessageService.SendOrderProcessingMessageAsync(JsonSerializer.Serialize(message));
-
-            _logger.LogInformation(
-                "Initiated order request {OrderRequestId} for customer {CustomerId}",
-                message.OrderRequestId,
-                request.CustomerId);
-
-            return message.OrderRequestId;
+                _logger.LogError(ex, "Error creating order for request {OrderRequestId}", command.OrderRequestId);
+                throw;
+            }
         }
 
-        public async Task<Order?> GetOrderByRequestIdAsync(string orderRequestId)
+        public async Task ShipOrderAsync(ShipOrderCommand command)
         {
-            return await _orderRepository.Query()
-                .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.OrderRequestId == orderRequestId);
+            try
+            {
+                await _shipOrderHandler.HandleAsync(command);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error shipping order {OrderId}", command.OrderId);
+                throw;
+            }
         }
 
-        public async Task<Order> GetOrderAsync(string orderId)
+        public async Task<OrderResponse?> GetOrderByRequestIdAsync(GetOrderByRequestIdQuery query)
         {
-            var order = await _orderRepository.Query()
-                .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
-
-            if (order == null)
+            try
             {
-                throw new StoreException(
-                    "Order not found",
-                    (int)HttpStatusCode.NotFound);
+                return await _getByRequestIdHandler.HandleAsync(query);
             }
-
-            return order;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving order by request ID {RequestId}", query.OrderRequestId);
+                throw;
+            }
         }
 
-        public async Task ShipOrderAsync(string orderId)
+        public async Task<OrderResponse?> GetOrderAsync(GetOrderByIdQuery query)
         {
-            var order = await _orderRepository.GetByIdAsync(orderId);
-
-            if (order == null)
+            try
             {
-                throw new StoreException(
-                    "Order not found",
-                    (int)HttpStatusCode.NotFound);
+                return await _getByIdHandler.HandleAsync(query);
             }
-
-            if (order.ShippedDate.HasValue)
+            catch (Exception ex)
             {
-                throw new StoreException(
-                    "Order is already shipped",
-                    (int)HttpStatusCode.BadRequest);
+                _logger.LogError(ex, "Error retrieving order {OrderId}", query.OrderId);
+                throw;
             }
-
-            order.ShippedDate = DateTime.UtcNow;
-            await _orderRepository.UpdateAsync(order);
-
-            _logger.LogInformation("Shipped order {OrderId}", orderId);
         }
     }
 }

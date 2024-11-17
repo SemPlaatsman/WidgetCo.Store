@@ -5,8 +5,8 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text.RegularExpressions;
 using WidgetCo.Store.Core.Exceptions;
-using WidgetCo.Store.Core.Interfaces.Storage;
 using WidgetCo.Store.Core.Options;
+using WidgetCo.Store.Infrastructure.Interfaces.Storage;
 
 namespace WidgetCo.Store.Infrastructure.Storage
 {
