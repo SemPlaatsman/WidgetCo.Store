@@ -10,6 +10,7 @@ using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Options;
 using WidgetCo.Store.Core.Queries;
 using WidgetCo.Store.Functions;
+using WidgetCo.Store.Core.Extensions;
 
 public class ReviewFunctions : BaseFunctionHandler
 {
@@ -34,6 +35,8 @@ public class ReviewFunctions : BaseFunctionHandler
             var request = JsonSerializer.Deserialize<CreateReviewRequest>(
                 requestBody,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            request.ValidateAndThrow();
 
             var command = new CreateReviewCommand(
                 request.ProductId,

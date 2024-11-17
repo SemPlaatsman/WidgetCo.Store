@@ -35,7 +35,6 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Commands
                     ImageUrl = command.ImageUrl
                 };
 
-                product.ValidateAndThrow();
                 return await _productRepository.CreateAsync(product);
             }
             catch (Exception ex) when (ex is not StoreException)
@@ -82,7 +81,6 @@ namespace WidgetCo.Store.Infrastructure.Handlers.Commands
                     ImageUrl = command.ImageUrl
                 };
 
-                updatedProduct.ValidateAndThrow();
                 await _productRepository.UpdateAsync(updatedProduct);
 
                 return Unit.Value;

@@ -35,9 +35,6 @@ namespace WidgetCo.Store.Infrastructure.Handlers
                     CreatedDate = DateTime.UtcNow
                 };
 
-                // Domain validation
-                review.ValidateAndThrow();
-
                 var reviewEntity = ReviewEntity.FromDomain(review);
                 return await _repository.CreateAsync(reviewEntity);
             }

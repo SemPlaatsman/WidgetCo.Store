@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using WidgetCo.Store.Core.DTOs.Products;
 using WidgetCo.Store.Core.Commands;
 using Azure.Core;
+using WidgetCo.Store.Core.Extensions;
 
 namespace WidgetCo.Store.Api.Controllers
 {
@@ -60,6 +61,7 @@ namespace WidgetCo.Store.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateProduct(CreateProductRequest request)
         {
+            request.ValidateAndThrow();
             try
             {
                 var command = new CreateProductCommand(
@@ -84,6 +86,7 @@ namespace WidgetCo.Store.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateProduct(string productId, UpdateProductRequest request)
         {
+            request.ValidateAndThrow();
             try
             {
                 if (productId != request.Id)

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using WidgetCo.Store.Core.Commands;
 using WidgetCo.Store.Core.DTOs.Orders;
+using WidgetCo.Store.Core.Extensions;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Options;
 using WidgetCo.Store.Core.Queries;
@@ -26,6 +27,7 @@ namespace WidgetCo.Store.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrderRequest request)
         {
+            request.ValidateAndThrow();
             try
             {
                 var command = new InitiateOrderCommand(
