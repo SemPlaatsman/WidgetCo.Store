@@ -1,0 +1,43 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/Api/**'
+      - 'src/Core/**'
+      - 'src/Infrastructure/**'
+
+env:
+  AZURE_WEBAPP_NAME: widgetco-api
+  AZURE_WEBAPP_PACKAGE_PATH: './published'
+  SOLUTION_FILE_PATH: './src'
+  PROJECT_PATH: './src/Api/Api.csproj'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE_PATH }}
+
+    - name: Build
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+    - name: Deploy to Azure WebApp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
