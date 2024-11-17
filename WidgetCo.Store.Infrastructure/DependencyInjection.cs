@@ -1,18 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using WidgetCo.Store.Core.Commands;
 using WidgetCo.Store.Core.Common;
+using WidgetCo.Store.Core.DTOs.Orders;
 using WidgetCo.Store.Core.DTOs.Products;
 using WidgetCo.Store.Core.DTOs.Reviews;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Queries;
 using WidgetCo.Store.Infrastructure.Data.Repository;
+using WidgetCo.Store.Infrastructure.Handlers;
 using WidgetCo.Store.Infrastructure.Handlers.Commands;
 using WidgetCo.Store.Infrastructure.Handlers.Queries;
+using WidgetCo.Store.Infrastructure.Interfaces.Storage;
 using WidgetCo.Store.Infrastructure.Services;
 using WidgetCo.Store.Infrastructure.Storage.Interfaces;
-using WidgetCo.Store.Infrastructure.Handlers;
-using WidgetCo.Store.Infrastructure.Interfaces.Storage;
-using WidgetCo.Store.Core.DTOs.Orders;
 using WidgetCo.Store.Infrastructure.Storage.Repositories;
 
 namespace WidgetCo.Store.Infrastructure

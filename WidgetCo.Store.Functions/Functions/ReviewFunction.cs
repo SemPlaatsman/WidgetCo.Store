@@ -1,16 +1,17 @@
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
 using WidgetCo.Store.Core.Commands;
 using WidgetCo.Store.Core.DTOs.Reviews;
+using WidgetCo.Store.Core.Extensions;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Options;
 using WidgetCo.Store.Core.Queries;
 using WidgetCo.Store.Functions;
-using WidgetCo.Store.Core.Extensions;
 
 public class ReviewFunctions : BaseFunctionHandler
 {
@@ -35,6 +36,9 @@ public class ReviewFunctions : BaseFunctionHandler
             var request = JsonSerializer.Deserialize<CreateReviewRequest>(
                 requestBody,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (request == null)
+                throw new ValidationException("Request body cannot be null");
 
             request.ValidateAndThrow();
 

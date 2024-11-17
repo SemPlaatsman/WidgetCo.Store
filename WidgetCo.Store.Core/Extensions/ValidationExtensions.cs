@@ -1,5 +1,5 @@
-﻿using System.Net;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using WidgetCo.Store.Core.Exceptions;
 
 namespace WidgetCo.Store.Core.Extensions

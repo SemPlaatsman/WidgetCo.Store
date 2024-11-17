@@ -1,12 +1,10 @@
-﻿using WidgetCo.Store.Core.Interfaces;
-using WidgetCo.Store.Core.Models;
-using WidgetCo.Store.Core.Options;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using WidgetCo.Store.Core.DTOs.Products;
 using WidgetCo.Store.Core.Commands;
-using Azure.Core;
+using WidgetCo.Store.Core.DTOs.Products;
 using WidgetCo.Store.Core.Extensions;
+using WidgetCo.Store.Core.Interfaces;
+using WidgetCo.Store.Core.Options;
 
 namespace WidgetCo.Store.Api.Controllers
 {

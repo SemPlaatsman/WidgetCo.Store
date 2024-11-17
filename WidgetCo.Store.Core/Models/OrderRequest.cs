@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace WidgetCo.Store.Core.Models
+﻿namespace WidgetCo.Store.Core.Models
 {
     public class OrderRequest
     {

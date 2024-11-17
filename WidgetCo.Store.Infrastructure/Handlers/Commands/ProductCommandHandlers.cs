@@ -3,7 +3,6 @@ using System.Net;
 using WidgetCo.Store.Core.Commands;
 using WidgetCo.Store.Core.Common;
 using WidgetCo.Store.Core.Exceptions;
-using WidgetCo.Store.Core.Extensions;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Models;
 using WidgetCo.Store.Infrastructure.Storage.Interfaces;

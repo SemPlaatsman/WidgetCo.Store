@@ -1,6 +1,5 @@
 ﻿using WidgetCo.Store.Core.Commands;
 using WidgetCo.Store.Core.DTOs.Orders;
-using WidgetCo.Store.Core.Models;
 using WidgetCo.Store.Core.Queries;
 
 namespace WidgetCo.Store.Core.Interfaces
