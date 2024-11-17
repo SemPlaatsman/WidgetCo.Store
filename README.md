@@ -182,6 +182,27 @@ This project uses the following Azure resources:
 - Azure App Service (for hosting the API)
 - Azure Functions (for serverless operations)
 
+### Azure Resource Tiers
+
+This proof of concept uses cost-effective service tiers:
+
+- **App Service Plan**: Basic (B1)
+  - Suitable for development and light production loads
+  - 1 core, 1.75 GB RAM
+  - Supports both the Web API and Function Apps
+- **SQL Database**: Basic
+  - 2 GB storage
+  - Good for development and small applications
+- **Storage Account**: Standard LRS (Locally Redundant Storage)
+  - Cost-effective storage option
+  - Suitable for non-critical data
+
+> [!NOTE]
+> These tiers are chosen for proof of concept purposes. For production use, consider:
+> - Standard tier (S1) or higher for App Service Plan if higher performance is needed
+> - Standard tier for SQL Database for better performance and larger data capacity
+> - Zone-redundant or geo-redundant storage for better data protection
+
 ## Deployment
 
 ### Prerequisites
@@ -226,6 +247,40 @@ After running the deployment scripts:
 2. Deploy your application code through Visual Studio or GitHub Actions
 3. Run database migrations
 4. Test the endpoints
+
+## Infrastructure as Code
+
+### Bicep Deployment
+The [`deployment/bicep`](./deployment/bicep) folder contains Bicep templates for Azure resource deployment:
+
+- [`main.bicep`](./deployment/bicep/main.bicep) - Main deployment template
+- [`modules/`](./deployment/bicep/modules)
+  - [`storage.bicep`](./deployment/bicep/modules/storage.bicep) - Storage account, containers, queues, and tables
+  - [`sql.bicep`](./deployment/bicep/modules/sql.bicep) - SQL Server and database
+  - [`app-service.bicep`](./deployment/bicep/modules/app-service.bicep) - App Service Plan, Web App, and Function App
+
+To deploy using Bicep:
+
+1. Login to Azure CLI:
+```bash
+az login
+```
+
+2. Deploy the resources:
+```bash
+az deployment sub create \
+  --location northeurope \
+  --template-file deployment/bicep/main.bicep \
+  --parameters environmentName=prod
+```
+
+The Bicep templates will create all necessary Azure resources with proper configurations and connections.
+
+> [!IMPORTANT]
+> Before deployment:
+> - Update the SQL administrator password in `main.bicep`
+> - Review the SKUs and pricing tiers in the templates
+> - Consider using Azure Key Vault for sensitive values in production
 
 ## Development
 
