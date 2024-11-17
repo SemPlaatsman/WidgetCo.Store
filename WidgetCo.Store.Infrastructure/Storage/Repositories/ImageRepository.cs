@@ -8,7 +8,7 @@ using WidgetCo.Store.Core.Exceptions;
 using WidgetCo.Store.Core.Options;
 using WidgetCo.Store.Infrastructure.Interfaces.Storage;
 
-namespace WidgetCo.Store.Infrastructure.Storage
+namespace WidgetCo.Store.Infrastructure.Storage.Repositories
 {
     public class ImageRepository : IImageRepository
     {

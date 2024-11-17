@@ -1,38 +1,33 @@
 ﻿using Microsoft.Extensions.Logging;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Infrastructure.Interfaces.Storage;
+using WidgetCo.Store.Infrastructure.Util;
 
 namespace WidgetCo.Store.Infrastructure.Services
 {
-    public class ProductImageService : IProductImageService
+    // CQRS does not apply to this service
+    public class ProductImageService(
+        IImageRepository imageRepository,
+        ILogger<ProductImageService> logger) : IProductImageService
     {
-        private readonly IImageRepository _imageRepository;
-        private readonly ILogger<ProductImageService> _logger;
+        public Task<string> UploadImageAsync(Stream imageStream, string fileName) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                async () =>
+                {
+                    imageRepository.ValidateImage(imageStream, fileName);
+                    var contentType = GetContentType(fileName);
+                    return await imageRepository.UploadImageAsync(imageStream, fileName, contentType);
+                },
+                "Error uploading image {FileName}",
+                fileName);
 
-        public ProductImageService(
-            IImageRepository imageRepository,
-            ILogger<ProductImageService> logger)
-        {
-            _imageRepository = imageRepository;
-            _logger = logger;
-        }
+        public Task<IEnumerable<string>> GetAllImageUrlsAsync() =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => imageRepository.GetAllImageUrlsAsync(),
+                "Error retrieving all image URLs");
 
-        public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
-        {
-            _imageRepository.ValidateImage(imageStream, fileName);
-
-            var contentType = GetContentType(fileName);
-            return await _imageRepository.UploadImageAsync(imageStream, fileName, contentType);
-        }
-
-        public async Task<IEnumerable<string>> GetAllImageUrlsAsync()
-        {
-            return await _imageRepository.GetAllImageUrlsAsync();
-        }
-
-        private static string GetContentType(string fileName)
-        {
-            return Path.GetExtension(fileName).ToLower() switch
+        private static string GetContentType(string fileName) =>
+            Path.GetExtension(fileName).ToLower() switch
             {
                 ".jpg" or ".jpeg" => "image/jpeg",
                 ".png" => "image/png",
@@ -40,6 +35,5 @@ namespace WidgetCo.Store.Infrastructure.Services
                 ".webp" => "image/webp",
                 _ => "application/octet-stream"
             };
-        }
     }
 }

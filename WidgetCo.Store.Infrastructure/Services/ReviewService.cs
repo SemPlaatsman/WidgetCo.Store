@@ -1,44 +1,27 @@
-﻿using Azure.Data.Tables;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Data.Common;
-using System.Net;
+﻿using Microsoft.Extensions.Logging;
 using WidgetCo.Store.Core.Commands;
 using WidgetCo.Store.Core.DTOs.Reviews;
-using WidgetCo.Store.Core.Exceptions;
-using WidgetCo.Store.Core.Extensions;
 using WidgetCo.Store.Core.Interfaces;
-using WidgetCo.Store.Core.Models;
 using WidgetCo.Store.Core.Queries;
-using WidgetCo.Store.Infrastructure.Options;
-using WidgetCo.Store.Infrastructure.Storage.Entities;
+using WidgetCo.Store.Infrastructure.Util;
 
 namespace WidgetCo.Store.Infrastructure.Services
 {
-    public class ReviewService : IReviewService
+    public class ReviewService(
+        ICommandHandler<CreateReviewCommand, string> createReviewHandler,
+        IQueryHandler<GetProductReviewsQuery, IEnumerable<ReviewDto>> getReviewsHandler,
+        ILogger<ReviewService> logger) : IReviewService
     {
-        private readonly ICommandHandler<CreateReviewCommand, string> _createReviewHandler;
-        private readonly IQueryHandler<GetProductReviewsQuery, IEnumerable<ReviewDto>> _getReviewsHandler;
-        private readonly ILogger<ReviewService> _logger;
+        public Task<string> CreateReviewAsync(CreateReviewCommand command) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => createReviewHandler.HandleAsync(command),
+                "Error creating review for product {ProductId}",
+                command.ProductId);
 
-        public ReviewService(
-            ICommandHandler<CreateReviewCommand, string> createReviewHandler,
-            IQueryHandler<GetProductReviewsQuery, IEnumerable<ReviewDto>> getReviewsHandler,
-            ILogger<ReviewService> logger)
-        {
-            _createReviewHandler = createReviewHandler;
-            _getReviewsHandler = getReviewsHandler;
-            _logger = logger;
-        }
-
-        public async Task<string> CreateReviewAsync(CreateReviewCommand command)
-        {
-            return await _createReviewHandler.HandleAsync(command);
-        }
-
-        public async Task<IEnumerable<ReviewDto>> GetProductReviewsAsync(GetProductReviewsQuery query)
-        {
-            return await _getReviewsHandler.HandleAsync(query);
-        }
+        public Task<IEnumerable<ReviewDto>> GetProductReviewsAsync(GetProductReviewsQuery query) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => getReviewsHandler.HandleAsync(query),
+                "Error retrieving reviews for product {ProductId}",
+                query.ProductId);
     }
 }

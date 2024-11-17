@@ -4,97 +4,46 @@ using WidgetCo.Store.Core.Common;
 using WidgetCo.Store.Core.DTOs.Orders;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Queries;
+using WidgetCo.Store.Infrastructure.Util;
 
 namespace WidgetCo.Store.Infrastructure.Services
 {
-    public class OrderService : IOrderService
+    public class OrderService(
+        ICommandHandler<InitiateOrderCommand, string> initiateOrderHandler,
+        ICommandHandler<CreateOrderCommand, string> createOrderHandler,
+        ICommandHandler<ShipOrderCommand, Unit> shipOrderHandler,
+        IQueryHandler<GetOrderByRequestIdQuery, OrderResponse?> getByRequestIdHandler,
+        IQueryHandler<GetOrderByIdQuery, OrderResponse?> getByIdHandler,
+        ILogger<OrderService> logger) : IOrderService
     {
-        private readonly ICommandHandler<InitiateOrderCommand, string> _initiateOrderHandler;
-        private readonly ICommandHandler<CreateOrderCommand, string> _createOrderHandler;
-        private readonly ICommandHandler<ShipOrderCommand, Unit> _shipOrderHandler;
-        private readonly IQueryHandler<GetOrderByRequestIdQuery, OrderResponse?> _getByRequestIdHandler;
-        private readonly IQueryHandler<GetOrderByIdQuery, OrderResponse?> _getByIdHandler;
-        private readonly ILogger<OrderService> _logger;
+        public Task<string> InitiateOrderAsync(InitiateOrderCommand command) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => initiateOrderHandler.HandleAsync(command),
+                "Error initiating order for customer {CustomerId}",
+                command.CustomerId);
 
-        public OrderService(
-            ICommandHandler<InitiateOrderCommand, string> initiateOrderHandler,
-            ICommandHandler<CreateOrderCommand, string> createOrderHandler,
-            ICommandHandler<ShipOrderCommand, Unit> shipOrderHandler,
-            IQueryHandler<GetOrderByRequestIdQuery, OrderResponse?> getByRequestIdHandler,
-            IQueryHandler<GetOrderByIdQuery, OrderResponse?> getByIdHandler,
-            ILogger<OrderService> logger)
-        {
-            _initiateOrderHandler = initiateOrderHandler;
-            _createOrderHandler = createOrderHandler;
-            _shipOrderHandler = shipOrderHandler;
-            _getByRequestIdHandler = getByRequestIdHandler;
-            _getByIdHandler = getByIdHandler;
-            _logger = logger;
-        }
+        public Task<string> CreateOrderAsync(CreateOrderCommand command) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => createOrderHandler.HandleAsync(command),
+                "Error creating order for request {OrderRequestId}",
+                command.OrderRequestId);
 
-        public async Task<string> InitiateOrderAsync(InitiateOrderCommand command)
-        {
-            try
-            {
-                return await _initiateOrderHandler.HandleAsync(command);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error initiating order for customer {CustomerId}", command.CustomerId);
-                throw;
-            }
-        }
+        public Task ShipOrderAsync(ShipOrderCommand command) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => shipOrderHandler.HandleAsync(command),
+                "Error shipping order {OrderId}",
+                command.OrderId);
 
-        public async Task<string> CreateOrderAsync(CreateOrderCommand command)
-        {
-            try
-            {
-                return await _createOrderHandler.HandleAsync(command);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating order for request {OrderRequestId}", command.OrderRequestId);
-                throw;
-            }
-        }
+        public Task<OrderResponse?> GetOrderByRequestIdAsync(GetOrderByRequestIdQuery query) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => getByRequestIdHandler.HandleAsync(query),
+                "Error retrieving order by request ID {RequestId}",
+                query.OrderRequestId);
 
-        public async Task ShipOrderAsync(ShipOrderCommand command)
-        {
-            try
-            {
-                await _shipOrderHandler.HandleAsync(command);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error shipping order {OrderId}", command.OrderId);
-                throw;
-            }
-        }
-
-        public async Task<OrderResponse?> GetOrderByRequestIdAsync(GetOrderByRequestIdQuery query)
-        {
-            try
-            {
-                return await _getByRequestIdHandler.HandleAsync(query);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving order by request ID {RequestId}", query.OrderRequestId);
-                throw;
-            }
-        }
-
-        public async Task<OrderResponse?> GetOrderAsync(GetOrderByIdQuery query)
-        {
-            try
-            {
-                return await _getByIdHandler.HandleAsync(query);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving order {OrderId}", query.OrderId);
-                throw;
-            }
-        }
+        public Task<OrderResponse?> GetOrderAsync(GetOrderByIdQuery query) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => getByIdHandler.HandleAsync(query),
+                "Error retrieving order {OrderId}",
+                query.OrderId);
     }
 }

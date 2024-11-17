@@ -1,40 +1,41 @@
-﻿using WidgetCo.Store.Core.Commands;
+﻿using Microsoft.Extensions.Logging;
+using WidgetCo.Store.Core.Commands;
 using WidgetCo.Store.Core.Common;
 using WidgetCo.Store.Core.DTOs.Products;
 using WidgetCo.Store.Core.Interfaces;
 using WidgetCo.Store.Core.Queries;
+using WidgetCo.Store.Infrastructure.Util;
 
 namespace WidgetCo.Store.Infrastructure.Services
 {
-    public class ProductService : IProductService
+    public class ProductService(
+        IQueryHandler<GetProductByIdQuery, ProductDto?> getProductByIdHandler,
+        IQueryHandler<GetAllProductsQuery, IEnumerable<ProductDto>> getAllProductsHandler,
+        ICommandHandler<CreateProductCommand, string> createProductHandler,
+        ICommandHandler<UpdateProductCommand, Unit> updateProductHandler,
+        ILogger<ProductService> logger) : IProductService
     {
-        private readonly IQueryHandler<GetProductByIdQuery, ProductDto?> _getProductByIdHandler;
-        private readonly IQueryHandler<GetAllProductsQuery, IEnumerable<ProductDto>> _getAllProductsHandler;
-        private readonly ICommandHandler<CreateProductCommand, string> _createProductHandler;
-        private readonly ICommandHandler<UpdateProductCommand, Unit> _updateProductHandler;
+        public Task<ProductDto?> GetProductByIdAsync(string productId) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => getProductByIdHandler.HandleAsync(new GetProductByIdQuery(productId)),
+                "Error retrieving product {ProductId}",
+                productId);
 
-        public ProductService(
-            IQueryHandler<GetProductByIdQuery, ProductDto?> getProductByIdHandler,
-            IQueryHandler<GetAllProductsQuery, IEnumerable<ProductDto>> getAllProductsHandler,
-            ICommandHandler<CreateProductCommand, string> createProductHandler,
-            ICommandHandler<UpdateProductCommand, Unit> updateProductHandler)
-        {
-            _getProductByIdHandler = getProductByIdHandler;
-            _getAllProductsHandler = getAllProductsHandler;
-            _createProductHandler = createProductHandler;
-            _updateProductHandler = updateProductHandler;
-        }
+        public Task<IEnumerable<ProductDto>> GetAllProductsAsync() =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => getAllProductsHandler.HandleAsync(new GetAllProductsQuery()),
+                "Error retrieving all products");
 
-        public async Task<ProductDto?> GetProductByIdAsync(string productId)
-            => await _getProductByIdHandler.HandleAsync(new GetProductByIdQuery(productId));
+        public Task<string> CreateProductAsync(CreateProductCommand command) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => createProductHandler.HandleAsync(command),
+                "Error creating product {ProductName}",
+                command.Name);
 
-        public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
-            => await _getAllProductsHandler.HandleAsync(new GetAllProductsQuery());
-
-        public async Task<string> CreateProductAsync(CreateProductCommand command)
-            => await _createProductHandler.HandleAsync(command);
-
-        public async Task UpdateProductAsync(UpdateProductCommand command)
-            => await _updateProductHandler.HandleAsync(command);
+        public Task UpdateProductAsync(UpdateProductCommand command) =>
+            logger.ExecuteWithExceptionLoggingAsync(
+                () => updateProductHandler.HandleAsync(command),
+                "Error updating product {ProductId}",
+                command.Id);
     }
 }

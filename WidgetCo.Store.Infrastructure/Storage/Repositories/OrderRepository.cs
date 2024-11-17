@@ -4,7 +4,7 @@ using WidgetCo.Store.Core.Models;
 using WidgetCo.Store.Infrastructure.Data;
 using WidgetCo.Store.Infrastructure.Storage.Interfaces;
 
-namespace WidgetCo.Store.Infrastructure.Storage
+namespace WidgetCo.Store.Infrastructure.Storage.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
