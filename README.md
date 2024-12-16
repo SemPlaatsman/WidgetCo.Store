@@ -4,7 +4,7 @@
 > Final grade: 10/10
 
 > [!NOTE]
-> <br>This project is also hosted on GitHub. See the repository [here](https://github.com/SemPlaatsman/WidgetCo.Store)
+> This project is also hosted on GitHub. See the repository [here](https://github.com/SemPlaatsman/WidgetCo.Store)
 
 This is a proof of concept project demonstrating cloud database usage in Azure. The solution consists of an API project and an Azure Functions project, utilizing various Azure services including SQL Database, Table Storage, Queue Storage, and Blob Storage.
 
