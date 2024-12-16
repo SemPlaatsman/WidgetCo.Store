@@ -1,5 +1,8 @@
 # Widget & Co Store
 
+> [!IMPORTANT]  
+> Final grade: 10/10
+
 > [!NOTE]
 > <br>This project is also hosted on GitHub. See the repository [here](https://github.com/SemPlaatsman/WidgetCo.Store)
 
